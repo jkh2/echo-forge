@@ -5,6 +5,8 @@ Preserve **Claude Artifacts**, **ChatGPT Canvas**, code, diagrams, citations, an
 
 > **Current Status:** Phase 0 complete. Working popup + foundation ready. Full export engine in active development.
 
+**🌐 [Try the beautiful live landing page](https://jkh2.github.io/echo-forge/)**
+
 ## What is EchoForge?
 
 EchoForge is a **privacy-first, fully open-source** browser extension that gives you complete ownership of your conversations with AI models.
@@ -32,7 +34,13 @@ It was built by the team behind Sentinel AI Systems for people who treat their A
 
 ## How to Try It Live (Right Now)
 
-### Option 1: Load Unpacked from GitHub (Recommended — Works Today)
+### Option 1: Visit the Live Landing Page (Easiest)
+
+**[→ Open EchoForge Landing Page](https://jkh2.github.io/echo-forge/)**
+
+Beautiful overview + direct download instructions.
+
+### Option 2: Load Unpacked from GitHub (Recommended for Testing)
 
 1. Go to the repository: [https://github.com/jkh2/echo-forge](https://github.com/jkh2/echo-forge)
 2. Click the green **Code** button → **Download ZIP**
@@ -42,13 +50,6 @@ It was built by the team behind Sentinel AI Systems for people who treat their A
 6. Click **Load unpacked**
 7. Select the `src` folder inside the unzipped directory
 8. The EchoForge icon will appear in your extensions toolbar
-
-### Option 2: Clone with Git
-```bash
-git clone https://github.com/jkh2/echo-forge.git
-cd echo-forge
-```
-Then follow steps 4–8 above using the `src` folder.
 
 ### Using the Extension
 1. Open a chat on a supported platform (Claude.ai or Grok.x.ai work best right now)
@@ -65,7 +66,7 @@ Then follow steps 4–8 above using the `src` folder.
 - Claude.ai
 - Grok (grok.x.ai)
 
-**Planned for Phase 1+:**
+**Planned for Phase 1+: **
 - ChatGPT + Canvas
 - Gemini
 - DeepSeek
@@ -112,6 +113,6 @@ MIT License — see [LICENSE](LICENSE) for details.
 ---
 
 **Ready to own your AI history?**  
-[Star the repo](https://github.com/jkh2/echo-forge) • Load it up • Help us build the future of persistent AI memory.
+[Star the repo](https://github.com/jkh2/echo-forge) • [Visit the Live Site](https://jkh2.github.io/echo-forge/) • Load it up • Help us build the future of persistent AI memory.
 
 Built as part of the Sentinel AI Systems ecosystem.
