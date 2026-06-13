@@ -1,4 +1,4 @@
-// EchoForge Popup Script - Phase 1 (Real Export)
+// EchoForge Popup Script - Phase 2 (Artifacts in Markdown)
 
 function updateStatus(message, type = 'info') {
   const statusEl = document.getElementById('status');
@@ -9,7 +9,7 @@ function updateStatus(message, type = 'info') {
     type === 'error' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
     'bg-zinc-800 text-zinc-400 border border-zinc-700'
   }`;
-  statusEl.innerHTML = `<span class="font-medium">${message}</span>`;
+  statusEl.innerHTML = `<span class=\"font-medium\">${message}</span>`;
   statusEl.classList.remove('hidden');
   
   setTimeout(() => {
@@ -44,12 +44,12 @@ function detectCurrentSite() {
     exportBtn.disabled = !supported;
 
     if (!supported) {
-      updateStatus('This site is not yet supported in Phase 1', 'error');
+      updateStatus('This site is not yet supported in Phase 2', 'error');
     }
   });
 }
 
-// Simple Markdown generator (inline for Phase 1)
+// Phase 2 Markdown generator with Artifact support
 function generateMarkdown(data) {
   const { title, platform, exportedAt, messageCount, messages, url } = data;
   
@@ -70,6 +70,22 @@ function generateMarkdown(data) {
   messages.forEach((msg, i) => {
     const roleLabel = msg.role === 'user' ? '**You**' : '**Assistant**';
     md += `\n\n${roleLabel}:\n\n${msg.content}\n`;
+
+    // Phase 2: Render Artifacts nicely
+    if (msg.artifacts && msg.artifacts.length > 0) {
+      msg.artifacts.forEach((artifact) => {
+        md += `\n\n> **Artifact: ${artifact.title}** (${artifact.type})\n\n`;
+        
+        if (artifact.type.includes('code') || artifact.type === 'unknown') {
+          const lang = artifact.type.includes('python') ? 'python' : 
+                       artifact.type.includes('javascript') ? 'js' : 
+                       artifact.type.includes('html') ? 'html' : '';
+          md += `\`\`${lang}\n${artifact.content}\n\`\`\n`;
+        } else {
+          md += `${artifact.content}\n`;
+        }
+      });
+    }
     
     if (i < messages.length - 1) {
       md += '\n---\n';
@@ -85,9 +101,9 @@ async function triggerExport() {
   
   exportBtn.disabled = true;
   exportBtn.innerHTML = `
-    <svg class="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    <svg class=\"animate-spin w-5 h-5\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\">
+      <circle class=\"opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" stroke-width=\"4\"></circle>
+      <path class=\"opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z\"></path>
     </svg>
     <span>Exporting...</span>
   `;
@@ -122,7 +138,7 @@ async function triggerExport() {
       saveAs: false
     });
 
-    // Also offer JSON (optional second download)
+    // Also offer JSON
     const jsonBlob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const jsonUrl = URL.createObjectURL(jsonBlob);
     
@@ -151,14 +167,14 @@ function init() {
 
   // Placeholder buttons
   document.getElementById('copy-md-btn').addEventListener('click', () => {
-    updateStatus('Copy to clipboard coming soon in Phase 2', 'info');
+    updateStatus('Copy to clipboard coming soon', 'info');
   });
 
   document.getElementById('settings-btn').addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
   });
 
-  console.log('%c[EchoForge] Popup initialized (Phase 1)', 'color:#64748b');
+  console.log('%c[EchoForge] Popup initialized (Phase 2)', 'color:#64748b');
 }
 
 if (document.readyState === 'loading') {
