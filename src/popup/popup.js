@@ -1,27 +1,20 @@
-// EchoForge Popup Script - Phase 0
-
-const tailwindScript = document.createElement('script');
-tailwindScript.src = 'https://cdn.tailwindcss.com';
-document.head.appendChild(tailwindScript);
-
-tailwindScript.onload = () => {
-  // Tailwind already included via CDN in HTML, this is just in case
-};
+// EchoForge Popup Script - Phase 1 (Real Export)
 
 function updateStatus(message, type = 'info') {
   const statusEl = document.getElementById('status');
+  if (!statusEl) return;
+  
   statusEl.className = `mb-4 px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${
     type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
     type === 'error' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
     'bg-zinc-800 text-zinc-400 border border-zinc-700'
   }`;
-  statusEl.innerHTML = `
-    <span class="font-medium">${message}</span>
-  `;
+  statusEl.innerHTML = `<span class="font-medium">${message}</span>`;
   statusEl.classList.remove('hidden');
+  
   setTimeout(() => {
     if (statusEl) statusEl.classList.add('hidden');
-  }, 4000);
+  }, 5000);
 }
 
 function detectCurrentSite() {
@@ -46,20 +39,49 @@ function detectCurrentSite() {
     siteEl.textContent = siteName;
     siteEl.className = 'text-sm font-mono text-emerald-400';
 
-    // Enable/disable export button based on supported site
     const exportBtn = document.getElementById('export-btn');
-    const supported = ['claude.ai', 'grok.x.ai', 'grok.com', 'chatgpt.com'].some(domain => tab.url.includes(domain));
+    const supported = ['claude.ai', 'grok.x.ai', 'grok.com'].some(domain => tab.url.includes(domain));
     exportBtn.disabled = !supported;
 
     if (!supported) {
-      updateStatus('This site is not yet supported', 'error');
+      updateStatus('This site is not yet supported in Phase 1', 'error');
     }
   });
 }
 
+// Simple Markdown generator (inline for Phase 1)
+function generateMarkdown(data) {
+  const { title, platform, exportedAt, messageCount, messages, url } = data;
+  
+  let md = `---
+  title: "${title || 'Untitled Conversation'}"
+  platform: "${platform}"
+  exported_at: "${exportedAt}"
+  message_count: ${messageCount}
+  source_url: "${url}"
+  ---
+
+  # ${title || 'Untitled Conversation'}
+
+  *Exported from ${platform} on ${new Date(exportedAt).toLocaleString()}*
+
+  `;
+
+  messages.forEach((msg, i) => {
+    const roleLabel = msg.role === 'user' ? '**You**' : '**Assistant**';
+    md += `\n\n${roleLabel}:\n\n${msg.content}\n`;
+    
+    if (i < messages.length - 1) {
+      md += '\n---\n';
+    }
+  });
+
+  return md.trim();
+}
+
 async function triggerExport() {
   const exportBtn = document.getElementById('export-btn');
-  const originalText = exportBtn.innerHTML;
+  const originalHTML = exportBtn.innerHTML;
   
   exportBtn.disabled = true;
   exportBtn.innerHTML = `
@@ -73,50 +95,72 @@ async function triggerExport() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     
-    if (!tab || !tab.id) throw new Error('No active tab');
+    if (!tab || !tab.id) throw new Error('No active tab found');
 
-    // Send message to content script
+    // Request data from content script
     const response = await chrome.tabs.sendMessage(tab.id, { 
-      action: 'exportConversation',
-      format: 'markdown' // default for Phase 0
+      action: 'exportConversation' 
     });
 
-    if (response && response.success) {
-      updateStatus('Export started! Check downloads.', 'success');
-    } else {
-      throw new Error(response?.error || 'Export failed');
+    if (!response || !response.success) {
+      throw new Error(response?.error || 'Failed to extract conversation');
     }
+
+    const data = response.data;
+
+    // Generate Markdown
+    const markdown = generateMarkdown(data);
+    const filenameBase = (data.title || 'conversation').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+    // Download Markdown
+    const blob = new Blob([markdown], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    
+    await chrome.downloads.download({
+      url: url,
+      filename: `${filenameBase}.md`,
+      saveAs: false
+    });
+
+    // Also offer JSON (optional second download)
+    const jsonBlob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const jsonUrl = URL.createObjectURL(jsonBlob);
+    
+    await chrome.downloads.download({
+      url: jsonUrl,
+      filename: `${filenameBase}.json`,
+      saveAs: false
+    });
+
+    updateStatus(`Exported ${data.messageCount} messages successfully!`, 'success');
+
   } catch (err) {
     console.error('EchoForge export error:', err);
     updateStatus(`Export failed: ${err.message}`, 'error');
   } finally {
     exportBtn.disabled = false;
-    exportBtn.innerHTML = originalText;
+    exportBtn.innerHTML = originalHTML;
   }
 }
 
 function init() {
-  // Detect current site
   detectCurrentSite();
 
-  // Export button
-  document.getElementById('export-btn').addEventListener('click', triggerExport);
+  const exportBtn = document.getElementById('export-btn');
+  exportBtn.addEventListener('click', triggerExport);
 
-  // Copy MD button (placeholder for Phase 0)
+  // Placeholder buttons
   document.getElementById('copy-md-btn').addEventListener('click', () => {
-    updateStatus('Copy to clipboard coming in Phase 1', 'info');
+    updateStatus('Copy to clipboard coming soon in Phase 2', 'info');
   });
 
-  // Settings button
   document.getElementById('settings-btn').addEventListener('click', () => {
     chrome.runtime.openOptionsPage();
   });
 
-  // Keyboard shortcut hint
-  console.log('%c[EchoForge] Popup initialized', 'color:#64748b');
+  console.log('%c[EchoForge] Popup initialized (Phase 1)', 'color:#64748b');
 }
 
-// Initialize when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
