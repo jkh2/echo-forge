@@ -1,4 +1,4 @@
-// EchoForge Popup Script - Phase 2 (Artifacts in Markdown)
+// EchoForge Popup Script - Phase 3 kickoff (Format selector)
 
 function updateStatus(message, type = 'info') {
   const statusEl = document.getElementById('status');
@@ -44,7 +44,7 @@ function detectCurrentSite() {
     exportBtn.disabled = !supported;
 
     if (!supported) {
-      updateStatus('This site is not yet supported in Phase 2', 'error');
+      updateStatus('This site is not yet supported in Phase 3', 'error');
     }
   });
 }
@@ -54,11 +54,11 @@ function generateMarkdown(data) {
   const { title, platform, exportedAt, messageCount, messages, url } = data;
   
   let md = `---
-  title: "${title || 'Untitled Conversation'}"
-  platform: "${platform}"
-  exported_at: "${exportedAt}"
+  title: \"${title || 'Untitled Conversation'}\"
+  platform: \"${platform}\"
+  exported_at: \"${exportedAt}\"
   message_count: ${messageCount}
-  source_url: "${url}"
+  source_url: \"${url}\"
   ---
 
   # ${title || 'Untitled Conversation'}
@@ -123,32 +123,33 @@ async function triggerExport() {
     }
 
     const data = response.data;
-
-    // Generate Markdown
-    const markdown = generateMarkdown(data);
+    const format = document.getElementById('format-select').value;
     const filenameBase = (data.title || 'conversation').replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
-    // Download Markdown
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    
-    await chrome.downloads.download({
-      url: url,
-      filename: `${filenameBase}.md`,
-      saveAs: false
-    });
+    if (format === 'markdown' || format === 'both') {
+      const markdown = generateMarkdown(data);
+      const blob = new Blob([markdown], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      await chrome.downloads.download({
+        url: url,
+        filename: `${filenameBase}.md`,
+        saveAs: false
+      });
+    }
 
-    // Also offer JSON
-    const jsonBlob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const jsonUrl = URL.createObjectURL(jsonBlob);
-    
-    await chrome.downloads.download({
-      url: jsonUrl,
-      filename: `${filenameBase}.json`,
-      saveAs: false
-    });
+    if (format === 'json' || format === 'both') {
+      const jsonContent = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonContent], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      await chrome.downloads.download({
+        url: url,
+        filename: `${filenameBase}.json`,
+        saveAs: false
+      });
+    }
 
-    updateStatus(`Exported ${data.messageCount} messages successfully!`, 'success');
+    const formatText = format === 'both' ? 'Markdown + JSON' : format.toUpperCase();
+    updateStatus(`Exported ${data.messageCount} messages as ${formatText}!`, 'success');
 
   } catch (err) {
     console.error('EchoForge export error:', err);
@@ -174,7 +175,7 @@ function init() {
     chrome.runtime.openOptionsPage();
   });
 
-  console.log('%c[EchoForge] Popup initialized (Phase 2)', 'color:#64748b');
+  console.log('%c[EchoForge] Popup initialized (Phase 3 kickoff)', 'color:#64748b');
 }
 
 if (document.readyState === 'loading') {

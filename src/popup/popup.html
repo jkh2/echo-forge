@@ -35,6 +35,15 @@
         <div id="current-site" class="text-sm font-mono text-emerald-400 truncate">Detecting...</div>
       </div>
 
+      <div class="mb-3">
+        <label class="block text-xs text-zinc-400 mb-1.5">Export Format</label>
+        <select id="format-select" class="w-full bg-zinc-800 border border-zinc-700 text-white text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500">
+          <option value="markdown">Markdown (.md)</option>
+          <option value="json">JSON (.json)</option>
+          <option value="both">Both (.md + .json)</option>
+        </select>
+      </div>
+
       <button id="export-btn"
               class="w-full bg-white hover:bg-zinc-100 active:bg-zinc-200 transition-colors text-zinc-950 font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 text-base shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
