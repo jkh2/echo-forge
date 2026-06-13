@@ -1,0 +1,68 @@
+{
+  "manifest_version": 3,
+  "name": "EchoForge - AI Chat Exporter",
+  "version": "0.1.0",
+  "description": "Open-source browser extension to export high-quality AI chat history from Claude, Grok, ChatGPT and more. Preserve Artifacts, Canvas, code, diagrams, and feed into your local knowledge systems.",
+  "author": "Sentinel AI Systems",
+  "homepage_url": "https://github.com/jkh2/echo-forge",
+  "icons": {
+    "16": "public/icon16.png",
+    "48": "public/icon48.png",
+    "128": "public/icon128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "downloads",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://claude.ai/*",
+    "https://*.claude.ai/*",
+    "https://grok.x.ai/*",
+    "https://*.grok.x.ai/*",
+    "https://chatgpt.com/*",
+    "https://*.chatgpt.com/*",
+    "https://gemini.google.com/*",
+    "https://*.gemini.google.com/*",
+    "https://www.perplexity.ai/*",
+    "https://*.perplexity.ai/*",
+    "https://chat.deepseek.com/*"
+  ],
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "public/icon16.png",
+      "48": "public/icon48.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://claude.ai/*",
+        "https://*.claude.ai/*"
+      ],
+      "js": ["src/content/claude.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://grok.x.ai/*",
+        "https://*.grok.x.ai/*"
+      ],
+      "js": ["src/content/grok.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "src/options/options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["public/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

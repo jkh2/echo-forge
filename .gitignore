@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+dist/
+build/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Extension build output (if we add a build step later)
+*.zip
+echo-forge-*.crx
+
+# Temporary test files
+test-*.html
